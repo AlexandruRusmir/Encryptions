@@ -317,7 +317,7 @@ def generate_key():
 key_bytes = generate_key()
 
 # Scrie cheia într-un fișier.
-with open('AES_key.txt', 'wb') as key_file:
+with open('key.txt', 'wb') as key_file:
     key_file.write(key_bytes)
 
 # Criptează mesajul folosind cheia generată.
@@ -325,7 +325,7 @@ encrypted_message = encryption(key_bytes, b'a mote of dust suspended in a sunbea
 print(encrypted_message)
 
 # Citeste cheia din fișier.
-with open('AES_key.txt', 'rb') as key_file:
+with open('key.txt', 'rb') as key_file:
         read_key = key_file.read()
 
 # Decriptează mesajul folosind cheia citită din fișier.

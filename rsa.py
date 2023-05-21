@@ -52,18 +52,18 @@ class RSA:
         # e reprezintă cheia publică
         for i in range(2, t):
             if gcd(i, t) == 1:
-                self.e = i
+                e = i
                 break
 
         # Calculează d astfel încât (d * e) % t = 1
         # d reprezintă cheia privată
         d = 2
         while True:
-            if (d * self.e) % t == 1:
+            if (d * e) % t == 1:
                 break
             d += 1
 
-        self.cheie_publica = self.e
+        self.cheie_publica = e
         self.cheie_privata = d
 
     def cripteaza(self, msg):
