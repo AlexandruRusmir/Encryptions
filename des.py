@@ -1,3 +1,5 @@
+import random
+
 # Functia hex2bin converteste un sir hexazecimal in sir binar.
 def hex2bin(s):
     # Un dictionar care mapeaza fiecare cifra hexazecimala la echivalentul sau binar pe 4 biti.
@@ -222,11 +224,21 @@ def encrypt(pt, rkb, rk):
     cipher_text = permute(combine, IP_1, 64)
     return bin2hex(cipher_text)
 
-pt = "0123456789ABCDFE"
-key = "133457799BBCDFF1"
+def generate_des_key():
+    # Initializează un bytearray gol.
+    key = bytearray()
+    # Generează 8 octeți aleatori.
+    for _ in range(8):
+        byte = random.randint(0, 255)
+        key.append(byte)
+    # Transformă bytearray într-un șir hexazecimal.
+    hex_key = ''.join(format(b, '02X') for b in key)
+    return hex_key
 
-# Generarea cheii
-# --transformare hexazecimal in binar
+# Generează o cheie
+key = generate_des_key()
+with open('DES_key.txt', 'w') as file:
+    file.write(key)
 key = hex2bin(key)
 
 # --tabela pentru eliminarea bitilor de paritate
@@ -278,11 +290,38 @@ for i in range(0, 16):
 	rkb.append(round_key)
 	rk.append(bin2hex(round_key))
 
+pt = "0123456789EFDCBF"
 print("Criptare")
 cipher_text = encrypt(pt, rkb, rk)
 
 print("Text encriptat: ", cipher_text)
 
+# Citirea cheii din fișier pentru decriptare
+with open('DES_key.txt', 'r') as file:
+    key = file.read()
+key = hex2bin(key)
+
+# obtinerea cheii de 56 de biti din cheia de 64 de biti folosind bitii de paritate
+key = permute(key, keyp, 56)
+# Impartirea cheii in doua parti
+left = key[0:28] # rkb pentru cheile rundei in binar
+right = key[28:56] # rk pentru cheile rundei in hexazecimal
+
+rkb = []
+rk = []
+for i in range(0, 16):
+	# Deplasarea bitilor cu n pozitii verificand din tabela de deplasari
+	left = shift_left(left, shift_table[i])
+	right = shift_left(right, shift_table[i])
+
+	# Combinarea partilor stanga si dreapta
+	combine_str = left + right
+
+	# Compresia cheii de la 56 la 48 de biti
+	round_key = permute(combine_str, key_comp, 48)
+
+	rkb.append(round_key)
+	rk.append(bin2hex(round_key))
 print("Decriptare")
 rkb_rev = rkb[::-1]
 rk_rev = rk[::-1]
